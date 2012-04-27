@@ -20,10 +20,22 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-LOCAL_SHARED_LIBRARIES := liblog libEGL
+
+LOCAL_SHARED_LIBRARIES := \
+	liblog \
+	libEGL \
+	libdrm \
+	libhardware \
+	libhwdrm
 
 LOCAL_SRC_FILES := hwcomposer.cpp
 LOCAL_MODULE := hwcomposer.$(TARGET_PRODUCT)
 LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\" -Wall
 LOCAL_MODULE_TAGS := optional
+
+LOCAL_C_INCLUDES := \
+	external/drm \
+	external/drm/include/drm \
+	hardware/libhardware_drm
+
 include $(BUILD_SHARED_LIBRARY)

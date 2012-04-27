@@ -37,37 +37,6 @@ enum drm_swap_mode {
 	DRM_SWAP_SETCRTC,
 };
 
-struct gralloc_drm_t {
-	/* initialized by gralloc_drm_create */
-	int fd;
-	struct gralloc_drm_drv_t *drv;
-
-	/* initialized by gralloc_drm_init_kms */
-	drmModeResPtr resources;
-	uint32_t crtc_id;
-	uint32_t connector_id;
-	drmModeModeInfo mode;
-	int xdpi, ydpi;
-#ifdef DRM_MODE_FEATURE_DIRTYFB
-	drmModeClip clip;
-#endif
-
-	/* initialized by drv->init_kms_features */
-	int fb_format;
-	enum drm_swap_mode swap_mode;
-	int swap_interval;
-	int mode_quirk_vmwgfx;
-	int mode_sync_flip; /* page flip should block */
-	int vblank_secondary;
-
-	drmEventContext evctx;
-
-	int first_post;
-	struct gralloc_drm_bo_t *current_front, *next_front;
-	int waiting_flip;
-	unsigned int last_swap;
-};
-
 struct gralloc_drm_drv_t {
 	/* destroy the driver */
 	void (*destroy)(struct gralloc_drm_drv_t *drv);
@@ -110,6 +79,45 @@ struct gralloc_drm_bo_t {
 
 	int lock_count;
 	int locked_for;
+};
+
+struct gralloc_drm_t {
+	/* initialized by gralloc_drm_create */
+	int fd;
+	struct gralloc_drm_drv_t *drv;
+
+	/* initialized by gralloc_drm_init_kms */
+	drmModeResPtr resources;
+	uint32_t crtc_id;
+	uint32_t connector_id;
+	drmModeModeInfo mode;
+	int xdpi, ydpi;
+#ifdef DRM_MODE_FEATURE_DIRTYFB
+	drmModeClip clip;
+#endif
+
+	/* initialized by drv->init_kms_features */
+	int fb_format;
+	enum drm_swap_mode swap_mode;
+	int swap_interval;
+	int mode_quirk_vmwgfx;
+	int mode_sync_flip; /* page flip should block */
+	int vblank_secondary;
+
+	drmEventContext evctx;
+
+	int first_post;
+	struct gralloc_drm_bo_t *current_front, *next_front;
+	int waiting_flip;
+	unsigned int last_swap;
+};
+
+struct drm_module_t {
+	gralloc_module_t base;
+
+	pthread_mutex_t mutex;
+	struct hwdrm_t *hwdrm;
+	struct gralloc_drm_t *drm;
 };
 
 struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_pipe(int fd, const char *name);

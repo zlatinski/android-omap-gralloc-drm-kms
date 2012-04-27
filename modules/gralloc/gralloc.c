@@ -28,13 +28,7 @@
 #include <errno.h>
 
 #include "gralloc_drm.h"
-
-struct drm_module_t {
-	gralloc_module_t base;
-
-	pthread_mutex_t mutex;
-	struct gralloc_drm_t *drm;
-};
+#include "gralloc_drm_priv.h"
 
 /*
  * Initialize the DRM device object, optionally with KMS.
