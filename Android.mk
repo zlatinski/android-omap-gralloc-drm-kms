@@ -1,16 +1,16 @@
 # Copyright (C) 2010 Chia-I Wu <olvaffe@gmail.com>
 # Copyright (C) 2010-2011 LunarG Inc.
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
 # to deal in the Software without restriction, including without limitation
 # the rights to use, copy, modify, merge, publish, distribute, sublicense,
 # and/or sell copies of the Software, and to permit persons to whom the
 # Software is furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included
 # in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
@@ -19,7 +19,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-# Android.mk for drm_gralloc
+# Android.mk for hwdrm
+
+# Setting LOCAL_PATH will mess up all-subdir-makefiles, so do it beforehand.
+SUBDIR_MAKEFILES := $(call all-named-subdir-makefiles,modules)
 
 DRM_GPU_DRIVERS := $(strip $(filter-out swrast, $(BOARD_GPU_DRIVERS)))
 
@@ -55,7 +58,6 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-	gralloc.c \
 	gralloc_drm.c \
 	gralloc_drm_kms.c
 
@@ -66,11 +68,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_SHARED_LIBRARIES := \
 	libdrm \
 	liblog \
-	libcutils \
-
-# for glFlush/glFinish
-LOCAL_SHARED_LIBRARIES += \
-	libGLESv1_CM
+	libcutils
 
 ifneq ($(filter $(intel_drivers), $(DRM_GPU_DRIVERS)),)
 LOCAL_SRC_FILES += gralloc_drm_intel.c
@@ -122,10 +120,13 @@ LOCAL_STATIC_LIBRARIES += \
 LOCAL_SHARED_LIBRARIES += libdl
 endif # DRM_USES_PIPE
 
-LOCAL_MODULE := gralloc.$(TARGET_PRODUCT)
+LOCAL_CFLAGS += -DLOG_TAG=\"hwdrm\" -Wall
+
+LOCAL_MODULE := libhwdrm
 LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 
 include $(BUILD_SHARED_LIBRARY)
 
 endif # DRM_GPU_DRIVERS
+
+include $(SUBDIR_MAKEFILES)
