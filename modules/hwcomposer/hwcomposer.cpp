@@ -46,8 +46,8 @@ hwc_module_t HAL_MODULE_INFO_SYM = {
         version_major: 1,
         version_minor: 0,
         id: HWC_HARDWARE_MODULE_ID,
-        name: "Sample hwcomposer module",
-        author: "The Android Open Source Project",
+        name: "DRM/KMS hwcomposer module",
+        author: "",
         methods: &hwc_module_methods,
     }
 };

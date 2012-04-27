@@ -21,8 +21,9 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 LOCAL_SHARED_LIBRARIES := liblog libEGL
+
 LOCAL_SRC_FILES := hwcomposer.cpp
-LOCAL_MODULE := hwcomposer.default
-LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\"
+LOCAL_MODULE := hwcomposer.$(TARGET_PRODUCT)
+LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\" -Wall
 LOCAL_MODULE_TAGS := optional
 include $(BUILD_SHARED_LIBRARY)

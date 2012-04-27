@@ -21,8 +21,6 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-MOD"
-
 #include <cutils/log.h>
 #include <stdlib.h>
 #include <stdarg.h>
