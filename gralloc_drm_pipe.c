@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-PIPE"
+#define LOG_TAG "HWDRM-PIPE"
 
 #include <cutils/log.h>
 #include <errno.h>

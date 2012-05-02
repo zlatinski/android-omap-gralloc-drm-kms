@@ -27,7 +27,7 @@
 
 /* XXX This driver assumes evergreen. */
 
-#define LOG_TAG "GRALLOC-RADEON"
+#define LOG_TAG "HWDRM-RADEON"
 
 #include <cutils/log.h>
 #include <stdlib.h>

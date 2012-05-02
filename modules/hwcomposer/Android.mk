@@ -30,7 +30,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_SRC_FILES := hwcomposer.c
 LOCAL_MODULE := hwcomposer.$(TARGET_PRODUCT)
-LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\" -Wall
+LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\" -Wall -Wno-unused-parameter -O0 -g
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES := \

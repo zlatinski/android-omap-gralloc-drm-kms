@@ -27,7 +27,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-I915"
+#define LOG_TAG "HWDRM-INTEL"
 
 #include <cutils/log.h>
 #include <stdlib.h>

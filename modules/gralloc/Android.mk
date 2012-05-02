@@ -17,7 +17,7 @@ LOCAL_SRC_FILES += \
 
 LOCAL_MODULE := gralloc.$(TARGET_PRODUCT)
 
-LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -Wall
+LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -Wall -Wno-unused-parameter -O0 -g
 
 LOCAL_MODULE_TAGS := optional
 

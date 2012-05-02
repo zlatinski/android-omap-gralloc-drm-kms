@@ -120,7 +120,7 @@ LOCAL_STATIC_LIBRARIES += \
 LOCAL_SHARED_LIBRARIES += libdl
 endif # DRM_USES_PIPE
 
-LOCAL_CFLAGS += -DLOG_TAG=\"hwdrm\" -Wall
+LOCAL_CFLAGS += -Wall -Wno-unused-parameter -O0 -g
 
 LOCAL_MODULE := libhwdrm
 LOCAL_MODULE_TAGS := optional

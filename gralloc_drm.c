@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-DRM"
+#define LOG_TAG "HWDRM"
 
 #include <cutils/log.h>
 #include <cutils/atomic.h>
@@ -102,7 +102,6 @@ init_drv_from_fd(int fd)
 struct gralloc_drm_t *gralloc_drm_create(void)
 {
 	struct gralloc_drm_t *drm;
-	int err;
 
 	drm = calloc(1, sizeof(*drm));
 	if (!drm)

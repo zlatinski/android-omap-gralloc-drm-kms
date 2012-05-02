@@ -26,7 +26,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-NOUVEAU"
+#define LOG_TAG "HWDRM-NOUVEAU"
 
 #include <cutils/log.h>
 #include <stdlib.h>

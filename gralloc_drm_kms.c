@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#define LOG_TAG "GRALLOC-KMS"
+#define LOG_TAG "HWDRM-KMS"
 
 #include <cutils/properties.h>
 #include <cutils/log.h>
@@ -322,7 +322,6 @@ static void drm_kms_init_features(struct gralloc_drm_t *drm)
 	}
 	else if (drm->swap_mode == DRM_SWAP_COPY) {
 		struct gralloc_drm_bo_t *front;
-		int stride;
 
 		/* create the real front buffer */
 		front = gralloc_drm_bo_create(drm,
@@ -368,8 +367,6 @@ static drmModeModeInfoPtr find_mode(drmModeConnectorPtr connector, int *bpp)
 	int xres = 0, yres = 0;
 
 	if (property_get("debug.drm.mode", value, NULL)) {
-		char *p = value, *end;
-
 		/* parse <xres>x<yres>[@<bpp>] */
 		if (sscanf(value, "%dx%d@%d", &xres, &yres, bpp) != 3) {
 			*bpp = 0;
@@ -499,7 +496,7 @@ static int drm_kms_init_with_connector(struct gralloc_drm_t *drm,
  */
 int gralloc_drm_init_kms(struct gralloc_drm_t *drm)
 {
-	int i, ret;
+	int i;
 
 	if (drm->resources)
 		return 0;

@@ -125,7 +125,6 @@ static int drm_mod_lock(const gralloc_module_t *mod, buffer_handle_t handle,
 		int usage, int x, int y, int w, int h, void **ptr)
 {
 	struct gralloc_drm_bo_t *bo;
-	int err;
 
 	bo = gralloc_drm_bo_from_handle(handle);
 	if (!bo)
@@ -136,7 +135,6 @@ static int drm_mod_lock(const gralloc_module_t *mod, buffer_handle_t handle,
 
 static int drm_mod_unlock(const gralloc_module_t *mod, buffer_handle_t handle)
 {
-	struct drm_module_t *dmod = (struct drm_module_t *) mod;
 	struct gralloc_drm_bo_t *bo;
 
 	bo = gralloc_drm_bo_from_handle(handle);
@@ -159,7 +157,6 @@ static int drm_mod_close_gpu0(struct hw_device_t *dev)
 
 static int drm_mod_free_gpu0(alloc_device_t *dev, buffer_handle_t handle)
 {
-	struct drm_module_t *dmod = (struct drm_module_t *) dev->common.module;
 	struct gralloc_drm_bo_t *bo;
 
 	bo = gralloc_drm_bo_from_handle(handle);
@@ -179,7 +176,7 @@ static int drm_mod_alloc_gpu0(alloc_device_t *dev,
 {
 	struct drm_module_t *dmod = (struct drm_module_t *) dev->common.module;
 	struct gralloc_drm_bo_t *bo;
-	int size, bpp, err;
+	int bpp, err;
 
 	bpp = gralloc_drm_get_bpp(format);
 	if (!bpp)
@@ -251,7 +248,6 @@ static int drm_mod_set_swap_interval_fb0(struct framebuffer_device_t *fb,
 static int drm_mod_post_fb0(struct framebuffer_device_t *fb,
 		buffer_handle_t handle)
 {
-	struct drm_module_t *dmod = (struct drm_module_t *) fb->common.module;
 	struct gralloc_drm_bo_t *bo;
 
 	bo = gralloc_drm_bo_from_handle(handle);
