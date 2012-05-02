@@ -163,11 +163,17 @@ int gralloc_drm_auth_magic(struct gralloc_drm_t *drm, int32_t magic)
  */
 int gralloc_drm_set_master(struct gralloc_drm_t *drm)
 {
-	LOGD("set master");
-	drmSetMaster(drm->fd);
-	drm->first_post = 1;
+	int ret;
 
-	return 0;
+	ret = drmSetMaster(drm->fd);
+	if (ret) {
+		LOGE("Error: drmSetMaster failed: %s\n", strerror(errno));
+		return -errno;
+	} else {
+		drm->first_post = 1;
+		drm->master = 1;
+		return 0;
+	}
 }
 
 /*
@@ -175,7 +181,16 @@ int gralloc_drm_set_master(struct gralloc_drm_t *drm)
  */
 void gralloc_drm_drop_master(struct gralloc_drm_t *drm)
 {
-	drmDropMaster(drm->fd);
+	int ret;
+
+	if (!drm->master)
+		return;
+
+	ret = drmDropMaster(drm->fd);
+	if (ret)
+		LOGE("Error: drmDropMaster failed: %s\n", strerror(errno));
+
+	drm->master = 0;
 }
 
 /*
@@ -243,8 +258,8 @@ int gralloc_drm_handle_unregister(buffer_handle_t handle)
 /*
  * Create a buffer handle.
  */
-static struct gralloc_drm_handle_t *create_bo_handle(int width,
-		int height, int format, int usage)
+static struct gralloc_drm_handle_t *
+create_bo_handle(int width, int height, int format, int usage)
 {
 	struct gralloc_drm_handle_t *handle;
 

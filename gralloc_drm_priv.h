@@ -107,6 +107,7 @@ struct gralloc_drm_t {
 	drmEventContext evctx;
 
 	int first_post;
+	int master;
 	struct gralloc_drm_bo_t *current_front, *next_front;
 	int waiting_flip;
 	unsigned int last_swap;
