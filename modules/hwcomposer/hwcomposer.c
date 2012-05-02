@@ -26,10 +26,8 @@
 
 #include <EGL/egl.h>
 
-extern "C" {
 #include <gralloc_drm.h>
 #include <gralloc_drm_priv.h>
-}
 
 /*****************************************************************************/
 
@@ -78,10 +76,12 @@ static void dump_layer(hwc_layer_t const* l) {
 
 static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
 {
+	size_t i;
+
 	if (list && (list->flags & HWC_GEOMETRY_CHANGED)) {
 		LOGI("%s:\n", __func__);
 
-		for (size_t i=0 ; i<list->numHwLayers ; i++) {
+		for (i = 0; i < list->numHwLayers; i++) {
 			dump_layer(&list->hwLayers[i]);
 			list->hwLayers[i].compositionType = HWC_FRAMEBUFFER;
 		}
@@ -95,9 +95,11 @@ static int hwc_set(hwc_composer_device_t *dev,
         hwc_surface_t sur,
         hwc_layer_list_t* list)
 {
+	size_t i;
+
 	LOGI("%s:\n", __func__);
 
-	for (size_t i=0 ; i<list->numHwLayers ; i++) {
+	for (i = 0; i < list->numHwLayers; i++) {
 		dump_layer(&list->hwLayers[i]);
 	}
 
@@ -219,7 +221,7 @@ hwc_device_open(const struct hw_module_t* module, const char* name,
 	if (strcmp(name, HWC_HARDWARE_COMPOSER))
 		return -EINVAL;
 
-	dev = (hwc_context_t*)calloc(1, sizeof(*dev));
+	dev = calloc(1, sizeof(*dev));
 
 	err = drm_open(dev);
 	if (err) {
@@ -232,7 +234,7 @@ hwc_device_open(const struct hw_module_t* module, const char* name,
         /* initialize the procs */
         dev->device.common.tag = HARDWARE_DEVICE_TAG;
         dev->device.common.version = 0;
-        dev->device.common.module = const_cast<hw_module_t*>(module);
+        dev->device.common.module = (struct hw_module_t *) module;
         dev->device.common.close = hwc_device_close;
 
         dev->device.prepare = hwc_prepare;

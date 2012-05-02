@@ -28,7 +28,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libhardware \
 	libhwdrm
 
-LOCAL_SRC_FILES := hwcomposer.cpp
+LOCAL_SRC_FILES := hwcomposer.c
 LOCAL_MODULE := hwcomposer.$(TARGET_PRODUCT)
 LOCAL_CFLAGS:= -DLOG_TAG=\"hwcomposer\" -Wall
 LOCAL_MODULE_TAGS := optional
