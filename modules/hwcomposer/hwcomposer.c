@@ -123,7 +123,7 @@ static int hwc_device_close(struct hw_device_t *dev)
 /*****************************************************************************/
 
 static int
-drm_open(struct hwc_context_t *dev)
+drm_open(struct hwc_context_t *ctx)
 {
 	struct drm_module_t *module;
 	drmVersionPtr version;
@@ -145,9 +145,9 @@ drm_open(struct hwc_context_t *dev)
 	     module->base.common.name, module->base.common.version_major,
 	     module->base.common.version_minor);
 
-	dev->drm_fd = module->drm->fd;
+	ctx->drm_fd = module->drm->fd;
 
-	version = drmGetVersion(dev->drm_fd);
+	version = drmGetVersion(ctx->drm_fd);
 	if (!version) {
 		LOGE("Failed to get DRM Version\n");
 		return -errno;
@@ -161,19 +161,19 @@ drm_open(struct hwc_context_t *dev)
 }
 
 static int
-drm_list_kms(struct hwc_context_t *dev)
+drm_list_kms(struct hwc_context_t *ctx)
 {
 	drmModeResPtr resources;
 	drmModePlaneResPtr planes;
 	int i;
 
-	resources = drmModeGetResources(dev->drm_fd);
+	resources = drmModeGetResources(ctx->drm_fd);
 	if (!resources) {
 		LOGE("Failed to get KMS resources\n");
 		return -EINVAL;
 	}
 
-	planes = drmModeGetPlaneResources(dev->drm_fd);
+	planes = drmModeGetPlaneResources(ctx->drm_fd);
 	if (!planes) {
 		LOGE("Failed to get KMS resources\n");
 		drmModeFreeResources(resources);
@@ -215,32 +215,32 @@ static int
 hwc_device_open(const struct hw_module_t* module, const char* name,
 		struct hw_device_t** device)
 {
-	struct hwc_context_t *dev;
+	struct hwc_context_t *ctx;
 	int err = 0;
 
 	if (strcmp(name, HWC_HARDWARE_COMPOSER))
 		return -EINVAL;
 
-	dev = calloc(1, sizeof(*dev));
+	ctx = calloc(1, sizeof(*ctx));
 
-	err = drm_open(dev);
+	err = drm_open(ctx);
 	if (err) {
-		free(dev);
+		free(ctx);
 		return err;
 	}
 
-	drm_list_kms(dev);
+	drm_list_kms(ctx);
 
         /* initialize the procs */
-        dev->device.common.tag = HARDWARE_DEVICE_TAG;
-        dev->device.common.version = 0;
-        dev->device.common.module = (struct hw_module_t *) module;
-        dev->device.common.close = hwc_device_close;
+        ctx->device.common.tag = HARDWARE_DEVICE_TAG;
+        ctx->device.common.version = 0;
+        ctx->device.common.module = (struct hw_module_t *) module;
+        ctx->device.common.close = hwc_device_close;
 
-        dev->device.prepare = hwc_prepare;
-        dev->device.set = hwc_set;
+        ctx->device.prepare = hwc_prepare;
+        ctx->device.set = hwc_set;
 
-        *device = &dev->device.common;
+        *device = &ctx->device.common;
 
 	return 0;
 }
