@@ -126,4 +126,6 @@ int gralloc_drm_bo_add_fb(struct gralloc_drm_bo_t *bo);
 void gralloc_drm_bo_rm_fb(struct gralloc_drm_bo_t *bo);
 int gralloc_drm_bo_post(struct gralloc_drm_bo_t *bo);
 
+int gralloc_hal_to_drm_format(int hal_format);
+
 #endif /* _GRALLOC_DRM_H_ */

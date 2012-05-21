@@ -30,8 +30,51 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <pixelflinger/format.h>
+
+#include <drm_fourcc.h>
+
 #include "gralloc_drm.h"
 #include "gralloc_drm_priv.h"
+
+static struct hal_to_drm_format {
+	int hal;
+	int drm;
+	int bpp;
+} hal_to_drm_formats[] = {
+	{GGL_PIXEL_FORMAT_RGBA_8888,    DRM_FORMAT_ABGR8888, 32},
+	{GGL_PIXEL_FORMAT_RGBX_8888,    DRM_FORMAT_RGBX8888, 32},
+	{GGL_PIXEL_FORMAT_RGB_888,      DRM_FORMAT_RGB888,   24},
+	{GGL_PIXEL_FORMAT_RGB_565,      DRM_FORMAT_RGB565,   16},
+	{GGL_PIXEL_FORMAT_BGRA_8888,    DRM_FORMAT_ARGB8888, 32},
+	{GGL_PIXEL_FORMAT_RGBA_5551,    DRM_FORMAT_RGBA5551, 16},
+	{GGL_PIXEL_FORMAT_RGBA_4444,    DRM_FORMAT_RGBA4444, 16},
+	//{GGL_PIXEL_FORMAT_A_8, , 8},
+	//{GGL_PIXEL_FORMAT_L_8, , 8},
+	//{GGL_PIXEL_FORMAT_LA_88, , 16},
+	{GGL_PIXEL_FORMAT_RGB_332,      DRM_FORMAT_RGB332,    8},
+	{HAL_PIXEL_FORMAT_YV12,         DRM_FORMAT_YVU420,    0},
+
+	/* Legacy formats (deprecated), used by ImageFormat.java */
+	{HAL_PIXEL_FORMAT_YCbCr_422_SP, DRM_FORMAT_NV16,      0},
+	{HAL_PIXEL_FORMAT_YCrCb_420_SP, DRM_FORMAT_NV21,      0},
+	//{HAL_PIXEL_FORMAT_YCbCr_422_I, , 0}, /* YUY2 */
+
+	{GGL_PIXEL_FORMAT_NONE, 0, 0}, /* end marker */
+};
+
+int
+gralloc_hal_to_drm_format(int hal)
+{
+	int i;
+
+	for (i = 0; hal_to_drm_formats[i].hal != GGL_PIXEL_FORMAT_NONE; i++)
+		if (hal_to_drm_formats[i].hal == hal)
+			return hal_to_drm_formats[i].drm;
+
+	return 0;
+}
 
 /*
  * Return true if a bo needs fb.
@@ -47,17 +90,32 @@ int gralloc_drm_bo_need_fb(const struct gralloc_drm_bo_t *bo)
  */
 int gralloc_drm_bo_add_fb(struct gralloc_drm_bo_t *bo)
 {
-	uint8_t bpp;
+	uint32_t handles[4] = {0};
+	uint32_t pitches[4] = {0};
+	uint32_t offsets[4] = {0};
+	int ret;
 
 	if (bo->fb_id)
 		return 0;
 
-	bpp = gralloc_drm_get_bpp(bo->handle->format) * 8;
+	bo->drm_format = gralloc_hal_to_drm_format(bo->handle->format);
+	if (!bo->drm_format)
+		return EINVAL;
 
-	return drmModeAddFB(bo->drm->fd,
-			bo->handle->width, bo->handle->height, bpp, bpp,
-			bo->handle->stride, bo->fb_handle,
-			(uint32_t *) &bo->fb_id);
+	handles[0] = bo->fb_handle;
+	pitches[0] = bo->handle->stride;
+
+	ret = drmModeAddFB2(bo->drm->fd, bo->handle->width, bo->handle->height,
+			    bo->drm_format, handles, pitches, offsets,
+			    (uint32_t *) &bo->fb_id, 0);
+
+	LOGI("AddFB2: 0x%02X: %dx%d (%dx%d): %c%c%c%c = %d\n", bo->fb_id,
+	     bo->handle->width, bo->handle->height,
+	     bo->handle->stride, bo->handle->height,
+	     bo->drm_format & 0xFF, (bo->drm_format >> 8) & 0xFF,
+	     (bo->drm_format >> 16) & 0xFF, (bo->drm_format >> 24) & 0xFF, ret);
+
+	return ret;
 }
 
 /*
