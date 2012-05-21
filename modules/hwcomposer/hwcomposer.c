@@ -74,15 +74,37 @@ static void dump_layer(hwc_layer_t const* l) {
             l->displayFrame.bottom);
 }
 
+static void dump_bo(buffer_handle_t handle)
+{
+	struct gralloc_drm_bo_t *bo;
+	struct gralloc_drm_handle_t *info;
+
+	bo = gralloc_drm_bo_from_handle(handle);
+	if (!bo)
+		return;
+
+	LOGI("bo %p: GEM 0x%08X, FB 0x%08X\n",
+	     handle, bo->fb_handle, bo->fb_id);
+
+	info = bo->handle;
+	LOGI("\t%4dx%4d (%4dx%4d), format %d, usage 0x%X\n",
+	     info->width, info->height, info->stride, info->height,
+	     info->format, info->usage);
+}
+
 static int hwc_prepare(hwc_composer_device_t *dev, hwc_layer_list_t* list)
 {
 	size_t i;
 
-	if (list && (list->flags & HWC_GEOMETRY_CHANGED)) {
+	if (!list)
+		return 0;
+
+	if (list->flags & HWC_GEOMETRY_CHANGED) {
 		LOGI("%s:\n", __func__);
 
 		for (i = 0; i < list->numHwLayers; i++) {
 			dump_layer(&list->hwLayers[i]);
+			dump_bo(list->hwLayers[i].handle);
 			list->hwLayers[i].compositionType = HWC_FRAMEBUFFER;
 		}
 	}
@@ -160,6 +182,33 @@ drm_open(struct hwc_context_t *ctx)
 	return 0;
 }
 
+static void
+kms_plane_print(int fd, uint32_t id)
+{
+	drmModePlanePtr plane = drmModeGetPlane(fd, id);
+	char buffer[1024];
+	int i;
+
+	if (!plane) {
+		LOGE("Failed to get Plane %d: %s\n", id,
+		     strerror(errno));
+		return;
+	}
+
+	LOGI("\t\t%02d: FB %02d (%4dx%4d), CRTC %02d (%4dx%4d),"
+	     " Possible CRTCs 0x%02X\n", plane->plane_id, plane->fb_id,
+	     plane->crtc_x, plane->crtc_y, plane->crtc_id, plane->x, plane->y,
+	     plane->possible_crtcs);
+	for (i = 0; i < (int) plane->count_formats; i++)
+		sprintf(buffer + 6 * i, " %c%c%c%c,", plane->formats[i] & 0xFF,
+			(plane->formats[i] >> 8) & 0xFF,
+			(plane->formats[i] >> 16) & 0xFF,
+			(plane->formats[i] >> 24) & 0xFF);
+	LOGI("\t\t   Supported Formats:%s", buffer);
+
+	drmModeFreePlane(plane);
+}
+
 static int
 drm_list_kms(struct hwc_context_t *ctx)
 {
@@ -191,7 +240,7 @@ drm_list_kms(struct hwc_context_t *ctx)
 
 	LOGI("\tPlanes:\n");
 	for (i = 0; i < (int) planes->count_planes; i++)
-		LOGI("\t\t%d\n", planes->planes[i]);
+		kms_plane_print(ctx->drm_fd, planes->planes[i]);
 
 	LOGI("\tCRTCs:\n");
 	for (i = 0; i < resources->count_crtcs; i++)
