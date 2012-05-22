@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <pixelflinger/format.h>
+#include <system/graphics.h>
 
 #include <drm_fourcc.h>
 
@@ -43,17 +43,13 @@ static struct hal_to_drm_format {
 	int drm;
 	int bpp;
 } hal_to_drm_formats[] = {
-	{GGL_PIXEL_FORMAT_RGBA_8888,    DRM_FORMAT_ABGR8888, 32},
-	{GGL_PIXEL_FORMAT_RGBX_8888,    DRM_FORMAT_RGBX8888, 32},
-	{GGL_PIXEL_FORMAT_RGB_888,      DRM_FORMAT_RGB888,   24},
-	{GGL_PIXEL_FORMAT_RGB_565,      DRM_FORMAT_RGB565,   16},
-	{GGL_PIXEL_FORMAT_BGRA_8888,    DRM_FORMAT_ARGB8888, 32},
-	{GGL_PIXEL_FORMAT_RGBA_5551,    DRM_FORMAT_RGBA5551, 16},
-	{GGL_PIXEL_FORMAT_RGBA_4444,    DRM_FORMAT_RGBA4444, 16},
-	//{GGL_PIXEL_FORMAT_A_8, , 8},
-	//{GGL_PIXEL_FORMAT_L_8, , 8},
-	//{GGL_PIXEL_FORMAT_LA_88, , 16},
-	{GGL_PIXEL_FORMAT_RGB_332,      DRM_FORMAT_RGB332,    8},
+	{HAL_PIXEL_FORMAT_RGBA_8888,    DRM_FORMAT_ABGR8888, 32},
+	{HAL_PIXEL_FORMAT_RGBX_8888,    DRM_FORMAT_RGBX8888, 32},
+	{HAL_PIXEL_FORMAT_RGB_888,      DRM_FORMAT_RGB888,   24},
+	{HAL_PIXEL_FORMAT_RGB_565,      DRM_FORMAT_RGB565,   16},
+	{HAL_PIXEL_FORMAT_BGRA_8888,    DRM_FORMAT_ARGB8888, 32},
+	{HAL_PIXEL_FORMAT_RGBA_5551,    DRM_FORMAT_RGBA5551, 16},
+	{HAL_PIXEL_FORMAT_RGBA_4444,    DRM_FORMAT_RGBA4444, 16},
 	{HAL_PIXEL_FORMAT_YV12,         DRM_FORMAT_YVU420,    0},
 
 	/* Legacy formats (deprecated), used by ImageFormat.java */
@@ -61,7 +57,7 @@ static struct hal_to_drm_format {
 	{HAL_PIXEL_FORMAT_YCrCb_420_SP, DRM_FORMAT_NV21,      0},
 	//{HAL_PIXEL_FORMAT_YCbCr_422_I, , 0}, /* YUY2 */
 
-	{GGL_PIXEL_FORMAT_NONE, 0, 0}, /* end marker */
+	{0, 0, 0}, /* end marker */
 };
 
 int
@@ -69,7 +65,7 @@ gralloc_hal_to_drm_format(int hal)
 {
 	int i;
 
-	for (i = 0; hal_to_drm_formats[i].hal != GGL_PIXEL_FORMAT_NONE; i++)
+	for (i = 0; hal_to_drm_formats[i].hal; i++)
 		if (hal_to_drm_formats[i].hal == hal)
 			return hal_to_drm_formats[i].drm;
 
