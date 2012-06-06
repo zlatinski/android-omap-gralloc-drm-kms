@@ -401,3 +401,17 @@ void gralloc_drm_bo_unlock(struct gralloc_drm_bo_t *bo)
 	if (!bo->lock_count)
 		bo->locked_for = 0;
 }
+
+/*
+ * So that Mesa/EGL can get to the GEM name.
+ */
+int
+gralloc_drm_gem_name(buffer_handle_t _handle)
+{
+	struct gralloc_drm_handle_t *handle = gralloc_drm_handle(_handle);
+
+	if (handle)
+		return handle->name;
+	else
+		return 0;
+}

@@ -128,4 +128,6 @@ int gralloc_drm_bo_post(struct gralloc_drm_bo_t *bo);
 
 int gralloc_hal_to_drm_format(int hal_format);
 
+int gralloc_drm_gem_name(buffer_handle_t handle);
+
 #endif /* _GRALLOC_DRM_H_ */
