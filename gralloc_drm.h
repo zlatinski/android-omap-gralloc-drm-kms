@@ -133,4 +133,6 @@ int gralloc_hal_to_drm_format(int hal_format);
 
 int gralloc_drm_gem_name(buffer_handle_t handle);
 
+int gralloc_kms_planes_init(struct gralloc_drm_t *drm);
+
 #endif /* _GRALLOC_DRM_H_ */

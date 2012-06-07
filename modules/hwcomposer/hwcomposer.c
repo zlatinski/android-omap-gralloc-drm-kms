@@ -167,6 +167,8 @@ drm_open(struct hwc_context_t *ctx)
 	     module->base.common.name, module->base.common.version_major,
 	     module->base.common.version_minor);
 
+	ctx->drm_module = module;
+
 	ctx->drm_fd = module->drm->fd;
 
 	version = drmGetVersion(ctx->drm_fd);
@@ -279,6 +281,7 @@ hwc_device_open(const struct hw_module_t* module, const char* name,
 	}
 
 	drm_list_kms(ctx);
+	gralloc_kms_planes_init(ctx->drm_module->drm);
 
         /* initialize the procs */
         ctx->device.common.tag = HARDWARE_DEVICE_TAG;

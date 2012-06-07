@@ -128,9 +128,17 @@ struct gralloc_drm_t *gralloc_drm_create(void)
  */
 void gralloc_drm_destroy(struct gralloc_drm_t *drm)
 {
+	int i;
+
 	if (drm->drv)
 		drm->drv->destroy(drm->drv);
+
 	close(drm->fd);
+
+	for (i = 0; i < drm->plane_count; i++)
+		free(drm->planes[i]);
+	free(drm->planes);
+
 	free(drm);
 }
 

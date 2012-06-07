@@ -83,6 +83,21 @@ struct gralloc_drm_bo_t {
 	int locked_for;
 };
 
+struct gralloc_kms_plane {
+	unsigned int id;
+
+	/* 0 = inactive */
+	unsigned int fb;
+	unsigned int next_fb; /* for hwc_prepare */
+
+	/* not used currently, just throwing ideas around */
+	int layer; /* for rudimentary z-ordering */
+
+	/* if we keep this as the last element, we can make this dynamic */
+	int format_count;
+	unsigned int formats[];
+};
+
 struct gralloc_drm_t {
 	/* initialized by gralloc_drm_create */
 	int fd;
@@ -113,6 +128,9 @@ struct gralloc_drm_t {
 	struct gralloc_drm_bo_t *current_front, *next_front;
 	int waiting_flip;
 	unsigned int last_swap;
+
+	int plane_count;
+	struct gralloc_kms_plane **planes;
 };
 
 struct drm_module_t {

@@ -652,3 +652,119 @@ int gralloc_drm_is_kms_pipelined(struct gralloc_drm_t *drm)
 {
 	return (drm->swap_mode != DRM_SWAP_SETCRTC);
 }
+
+/*
+ *
+ * KMS Plane support for HWC.
+ *
+ */
+static int
+gralloc_kms_plane_add(struct gralloc_drm_t *drm, drmModePlanePtr plane)
+{
+	struct gralloc_kms_plane *ptr =
+		calloc(1, sizeof(struct gralloc_kms_plane) +
+		       4 * plane->count_formats);
+	int i;
+
+	if (!ptr) {
+		LOGE("Failed to allocate kms_plane: %s\n", strerror(errno));
+		return errno;
+	}
+
+	ptr->id = plane->plane_id;
+	ptr->format_count = plane->count_formats;
+
+	for (i = 0; i < (int) plane->count_formats; i++)
+		ptr->formats[i] = plane->formats[i];
+
+
+	drm->plane_count++;
+	drm->planes = realloc(drm->planes, drm->plane_count *
+			      sizeof(struct gralloc_kms_plane *));
+
+	if (!drm->planes) {
+		LOGE("Failed to allocate kms_planes: %s\n", strerror(errno));
+		drm->plane_count = 0;
+		free(ptr);
+		return errno;
+	}
+
+	drm->planes[drm->plane_count - 1] = ptr;
+
+	return 0;
+}
+
+int
+gralloc_kms_planes_init(struct gralloc_drm_t *drm)
+{
+	drmModeResPtr resources;
+	drmModePlaneResPtr planes;
+	int i, order;
+
+	/* What else than the ordering in the main resources would reliably
+	   tell us what the possible_crtcs field for the planes mean?
+	   Way to save overhead! */
+	resources = drmModeGetResources(drm->fd);
+	if (!resources) {
+		LOGE("Failed to get KMS resources\n");
+		return -EINVAL;
+	}
+
+	for (order = 0; order < resources->count_crtcs; order++)
+		if (resources->crtcs[order] == drm->crtc_id)
+			break;
+
+	if (order == resources->count_crtcs) {
+		LOGE("Failed to find crtc %d in KMS resources\n", drm->crtc_id);
+		drmModeFreeResources(resources);
+		return -EINVAL;
+	}
+
+	drmModeFreeResources(resources);
+
+	planes = drmModeGetPlaneResources(drm->fd);
+	if (!planes) {
+		LOGE("Failed to get KMS Plane resources\n");
+		return -EINVAL;
+	}
+
+	for (i = 0; i < (int) planes->count_planes; i++) {
+		drmModePlanePtr plane =
+			drmModeGetPlane(drm->fd, planes->planes[i]);
+
+		if (!plane) {
+			LOGE("Failed to get Plane %d: %s\n", planes->planes[i],
+			     strerror(errno));
+			return errno;
+		}
+
+		if (plane->possible_crtcs & (1 << order)) {
+			int ret = gralloc_kms_plane_add(drm, plane);
+			if (ret) {
+				drmModeFreePlane(plane);
+				drmModeFreePlaneResources(planes);
+				return ret;
+			}
+		}
+
+		drmModeFreePlane(plane);
+	}
+
+	drmModeFreePlaneResources(planes);
+
+	LOGI("%s: %d planes\n", __func__, drm->plane_count);
+	for (i = 0; i < drm->plane_count; i++) {
+		char buffer[1024];
+		int j;
+
+		for (j = 0; j < drm->planes[i]->format_count; j++)
+			sprintf(buffer + 6 * j, " %c%c%c%c,",
+				drm->planes[i]->formats[j] & 0xFF,
+				(drm->planes[i]->formats[j] >> 8) & 0xFF,
+				(drm->planes[i]->formats[j] >> 16) & 0xFF,
+				(drm->planes[i]->formats[j] >> 24) & 0xFF);
+		LOGI("\t%d: %s", drm->planes[i]->id, buffer);
+	}
+
+	return 0;
+}
