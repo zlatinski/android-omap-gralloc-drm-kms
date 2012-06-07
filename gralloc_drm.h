@@ -129,8 +129,6 @@ int gralloc_drm_bo_add_fb(struct gralloc_drm_bo_t *bo);
 void gralloc_drm_bo_rm_fb(struct gralloc_drm_bo_t *bo);
 int gralloc_drm_bo_post(struct gralloc_drm_bo_t *bo);
 
-int gralloc_hal_to_drm_format(int hal_format);
-
 int gralloc_drm_gem_name(buffer_handle_t handle);
 
 int gralloc_kms_planes_init(struct gralloc_drm_t *drm);

@@ -77,8 +77,6 @@ struct gralloc_drm_bo_t {
 	int fb_handle; /* the GEM handle of the bo */
 	int fb_id;     /* the fb id */
 
-	int drm_format;
-
 	int lock_count;
 	int locked_for;
 };
