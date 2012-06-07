@@ -26,6 +26,9 @@
 
 #include <hardware/gralloc.h>
 
+/* everything hardware should have an ALIGN */
+#define ALIGN(a, b) (((a) + ((b) - 1)) & ~((b) - 1))
+
 struct gralloc_drm_t;
 struct gralloc_drm_bo_t;
 
@@ -102,8 +105,8 @@ static inline void gralloc_drm_align_geometry(int format, int *width, int *heigh
 		break;
 	}
 
-	*width = (*width + align_w - 1) & ~(align_w - 1);
-	*height = (*height + align_h - 1) & ~(align_h - 1);
+	*width = ALIGN(*width, align_w);
+	*height = ALIGN(*height, align_h);
 
 	if (extra_height_div)
 		*height += *height / extra_height_div;
