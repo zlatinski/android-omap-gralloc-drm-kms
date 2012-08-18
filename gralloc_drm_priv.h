@@ -141,6 +141,7 @@ struct drm_module_t {
 
 struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_pipe(int fd, const char *name);
 struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_intel(int fd);
+struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_omap(int fd);
 struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_radeon(int fd);
 struct gralloc_drm_drv_t *gralloc_drm_drv_create_for_nouveau(int fd);
 

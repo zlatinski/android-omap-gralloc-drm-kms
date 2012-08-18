@@ -76,6 +76,10 @@ init_drv_from_fd(int fd)
 		if (!drv && !strcmp(version->name, "i915"))
 			drv = gralloc_drm_drv_create_for_intel(fd);
 #endif
+#ifdef ENABLE_OMAP
+		if (!drv && !strcmp(version->name, "omapdrm"))
+			drv = gralloc_drm_drv_create_for_omap(fd);
+#endif
 #ifdef ENABLE_RADEON
 		if (!drv && !strcmp(version->name, "radeon"))
 			drv = gralloc_drm_drv_create_for_radeon(fd);

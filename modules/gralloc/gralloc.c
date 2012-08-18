@@ -30,6 +30,15 @@
 #include "gralloc_drm.h"
 #include "gralloc_drm_priv.h"
 
+enum {
+	GRALLOC_MODULE_PERFORM_GET_DRM_FD                = 0x080000002,
+	GRALLOC_MODULE_PERFORM_GET_DRM_MAGIC             = 0x080000003,
+	GRALLOC_MODULE_PERFORM_AUTH_DRM_MAGIC            = 0x080000004,
+
+	GRALLOC_MODULE_PERFORM_ENTER_VT                  = 0x080000005,
+	GRALLOC_MODULE_PERFORM_LEAVE_VT                  = 0x080000006,
+};
+
 /*
  * Initialize the DRM device object, optionally with KMS.
  */

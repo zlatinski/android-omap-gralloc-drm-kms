@@ -22,9 +22,9 @@ LOCAL_CFLAGS:= -DLOG_TAG=\"gralloc\" -Wall -Wno-unused-parameter -O0 -g
 LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES := \
-	external/drm \
-	external/drm/include/drm \
-	hardware/libhardware_drm
+	hardware/ti/omap4xxx/libdrm-kms/libdrm \
+	hardware/ti/omap4xxx/libdrm-kms/libdrm/include/drm \
+	hardware/ti/omap4xxx/libdrm-kms/gralloc
 
 LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
 

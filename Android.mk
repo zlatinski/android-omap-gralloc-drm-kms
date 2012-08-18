@@ -30,12 +30,14 @@ intel_drivers := i915 i965 i915g
 radeon_drivers := r300g r600g
 nouveau_drivers := nouveau
 vmwgfx_drivers := vmwgfx
+omap_drivers := omapdrm
 
 valid_drivers := \
 	$(intel_drivers) \
 	$(radeon_drivers) \
 	$(nouveau_drivers) \
-	$(vmwgfx_drivers)
+	$(vmwgfx_drivers) \
+	$(omap_drivers)
 
 # warn about invalid drivers
 invalid_drivers := $(filter-out $(valid_drivers), $(DRM_GPU_DRIVERS))
@@ -62,8 +64,8 @@ LOCAL_SRC_FILES := \
 	gralloc_drm_kms.c
 
 LOCAL_C_INCLUDES := \
-	external/drm \
-	external/drm/include/drm
+	$(LOCAL_PATH)/../libdrm \
+	$(LOCAL_PATH)/../libdrm/include/drm
 
 LOCAL_SHARED_LIBRARIES := \
 	libdrm \
@@ -75,6 +77,13 @@ LOCAL_SRC_FILES += gralloc_drm_intel.c
 LOCAL_C_INCLUDES += external/drm/intel
 LOCAL_CFLAGS += -DENABLE_INTEL
 LOCAL_SHARED_LIBRARIES += libdrm_intel
+endif
+
+ifneq ($(filter $(omap_drivers), $(DRM_GPU_DRIVERS)),)
+LOCAL_SRC_FILES += gralloc_drm_omap.c
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libdrm/omap
+LOCAL_CFLAGS += -DENABLE_OMAPDRM
+LOCAL_SHARED_LIBRARIES += libdrm_omap
 endif
 
 ifneq ($(filter $(radeon_drivers), $(DRM_GPU_DRIVERS)),)

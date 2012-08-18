@@ -26,6 +26,22 @@
 
 #include <hardware/gralloc.h>
 
+#ifndef LOGE
+#define LOGE ALOGE
+#endif
+#ifndef LOGW
+#define LOGW ALOGW
+#endif
+#ifndef LOGI
+#define LOGI ALOGI
+#endif
+#ifndef LOGV
+#define LOGV ALOGV
+#endif
+#ifndef LOGD
+#define LOGD ALOGD
+#endif
+
 /* everything hardware should have an ALIGN */
 #define ALIGN(a, b) (((a) + ((b) - 1)) & ~((b) - 1))
 
