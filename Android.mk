@@ -24,6 +24,9 @@
 # Setting LOCAL_PATH will mess up all-subdir-makefiles, so do it beforehand.
 SUBDIR_MAKEFILES := $(call all-named-subdir-makefiles,modules)
 
+# Since this is a directory insight omap, we'll fix the GPU here
+BOARD_GPU_DRIVERS := omapdrm
+
 DRM_GPU_DRIVERS := $(strip $(filter-out swrast, $(BOARD_GPU_DRIVERS)))
 
 intel_drivers := i915 i965 i915g
